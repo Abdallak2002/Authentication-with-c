@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_USERS 10
+#define MAX_USERNAME_LENGTH 20
+#define MAX_PASSWORD_LENGTH 20
+
+
+enum Flag {
+    FALSE = 0,
+    TRUE = 1,
+    UNKNOWN = -1
+};
+
+union UserFlag {
+    int flag;
+};
+
+
+struct User {
+    char username[MAX_USERNAME_LENGTH];
+    char password[MAX_PASSWORD_LENGTH];
+    union UserFlag userFlag;
+};
+
+
+struct User users[MAX_USERS];
+int userCount = 0;
+
+
+void registerUser() {
+    if (userCount < MAX_USERS) {
+        printf("Enter username (max %d characters): ", MAX_USERNAME_LENGTH - 1);
+        scanf("%s", users[userCount].username);
+
+        printf("Enter password (max %d characters): ", MAX_PASSWORD_LENGTH - 1);
+        scanf("%s", users[userCount].password);
+
+        // Allow the user to set the flag value
+        printf("Enter flag (0 for False, 1 for True): ");
+        scanf("%d", &users[userCount].userFlag.flag);
+
+        userCount++;
+        printf("User registered successfully!\n");
+    } else {
+        printf("Maximum user limit reached!\n");
+    }
+}
+
+
+void loginUser() {
+    char username[MAX_USERNAME_LENGTH];
+    char password[MAX_PASSWORD_LENGTH];
+    int loggedIn = 0;
+
+    printf("Enter username: ");
+    scanf("%s", username);
+
+    printf("Enter password: ");
+    scanf("%s", password);
+
+    for (int i = 0; i < userCount; i++) {
+        if (strcmp(users[i].username, username) == 0 &&
+            strcmp(users[i].password, password) == 0) {
+            // Check the flag value before allowing login
+            if (users[i].userFlag.flag == TRUE || users[i].userFlag.flag == FALSE) {
+                printf("Login successful!\n");
+                loggedIn = 1;
+            } else {
+                printf("User account not activated.\n");
+            }
+            break;
+        }
+    }
+
+    if (!loggedIn) {
+        printf("Invalid username or password. Please try again.\n");
+    }
+}
+
+int main() {
+    int choice;
+
+    do {
+        printf("\n1. Register\n2. Login\n3. Quit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                registerUser();
+                break;
+            case 2:
+                loginUser();
+                break;
+            case 3:
+                printf("Goodbye!\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 3);
+
+    return 0;
+}
